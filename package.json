@@ -16,6 +16,7 @@
     "devDependencies": {
         "@types/node": "17.0.8",
         "@types/react": "17.0.38",
+        "@types/three": "^0.136.1",
         "eslint": "8.6.0",
         "eslint-config-next": "12.0.7",
         "glslify-import-loader": "^0.1.2",
