@@ -9,7 +9,7 @@ class AnimatState2 implements AnimatState<Vector2> {
     public stopAtEnd = true;
     public stop: boolean = false;
     public _state: Vector2;
-    public get state(): number {
+    public get state(): Vector2 {
         return this.state;
     }
     public mathFun: MathFunction = new LinearFunction();

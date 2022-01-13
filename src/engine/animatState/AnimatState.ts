@@ -2,7 +2,7 @@ interface AnimatState<T = number> {
     start: T;
     update(t: number): void;
     stop: boolean;
-    get state(): number;
+    get state(): T;
 }
 
 export default AnimatState;

@@ -3,13 +3,13 @@ import {Vector3} from "three";
 import MathFunction from "../mathFunction/MathFunction";
 import LinearFunction from "../mathFunction/LinearFunction";
 
-class AnimatState2 implements AnimatState<Vector3> {
+class AnimatState3 implements AnimatState<Vector3> {
     public start: Vector3;
     public end: Vector3;
     public stopAtEnd = true;
     public stop: boolean = false;
     public _state: Vector3;
-    public get state(): number {
+    public get state(): Vector3 {
         return this.state;
     }
     public mathFun: MathFunction = new LinearFunction();
@@ -38,4 +38,4 @@ class AnimatState2 implements AnimatState<Vector3> {
     }
 }
 
-export default AnimatState2;
+export default AnimatState3;
