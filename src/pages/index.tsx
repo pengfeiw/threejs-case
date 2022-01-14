@@ -1,6 +1,7 @@
 import type {NextPage} from "next";
 import {useEffect, useRef} from "react";
 import {BoxGeometry, Mesh, Color, MeshBasicMaterial, PerspectiveCamera, Scene, Vector3, WebGLRenderer, MeshPhongMaterial, DirectionalLight, AmbientLight, Raycaster} from "three";
+import AnimatState from "../engine/animatState/AnimatState";
 
 const init = (canvas: HTMLCanvasElement) => {
     const renderer = new WebGLRenderer({
@@ -16,6 +17,8 @@ const init = (canvas: HTMLCanvasElement) => {
     const camera = new PerspectiveCamera(45, 1, 0.1, 100);
     camera.position.set(0, 0, 100);
 
+    const pos = {x: camera.position.x, y: camera.position.y};
+    const animateState = new AnimatState(pos);
 
     const cubes: Mesh[] = [];
 
@@ -30,14 +33,18 @@ const init = (canvas: HTMLCanvasElement) => {
     const mousedown = (event: MouseEvent) => {
         const x = (event.clientX / window.innerWidth) * 2 - 1;
         const y = - (event.clientY / window.innerHeight) * 2 + 1;
-        
+
         raycaster.setFromCamera({x, y}, camera);
 
         const intersects = raycaster.intersectObjects(cubes);
 
         if (intersects.length > 0) {
-            camera.position.x = intersects[0].object.position.x;
-            camera.position.y = intersects[0].object.position.y;
+            animateState.to({x: intersects[0].object.position.x, y: intersects[0].object.position.y}).onUpdate((obj) => {
+                camera.position.x = obj.x;
+                camera.position.y = obj.y;
+
+                console.log("camera.position", camera.position.x, camera.position.y);
+            }).start();
         }
     }
 
@@ -80,7 +87,7 @@ const init = (canvas: HTMLCanvasElement) => {
 
     const render = (time: number) => {
         renderer.render(scene, camera);
-
+        animateState.update(time);
         requestAnimationFrame(render);
     };
 

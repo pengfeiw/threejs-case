@@ -25,7 +25,7 @@ const getValueByLinear = (et: number, start = 0, end = 1) => {
     const endValue = linear.getValue(1);
 
     let value = linear.getValue(et);
-    value = value / (endValue - startValue) * (end - start);
+    value = value / (endValue - startValue) * (end - start) + start;
 
     return value;
 };
@@ -37,7 +37,7 @@ const getValueByQuadratic = (et: number, start = 0, end = 1) => {
     const endValue = quadratic.getValue(1);
 
     let value = quadratic.getValue(et);
-    value = value / (endValue - startValue) * (end - start);
+    value = value / (endValue - startValue) * (end - start) + start;
 
     return value;
 };
