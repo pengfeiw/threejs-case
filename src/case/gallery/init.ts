@@ -73,39 +73,50 @@ const init = (canvas: HTMLCanvasElement) => {
 
     const on = () => {
         let isMousedown = false;
+        let isDrag = false;
         let mouseDownScreenPos = {x: 0, y: 0};
-        let viewOne = false;
+        let selectedId: number | null = null;
         let viewOneTarget = new Vector3();
+        let mouseDownNormal = {x: 0, y: 0};
         window.addEventListener("mousedown", (event: MouseEvent) => {
             isMousedown = true;
             mouseDownScreenPos = {x: event.offsetX, y: event.offsetY};
             const x = (event.clientX / window.innerWidth) * 2 - 1;
             const y = - (event.clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera({x, y}, camera);
-            const intersects = raycaster.intersectObjects(scene.children);
-
-            if (intersects.length > 0) {
-                const p = intersects[0].object.position;
-                viewOneTarget = new Vector3().copy(intersects[0].object.position);
-                const halfP = new Vector3(p.x * 0.8, p.y, p.z * 0.8);
-
-                camera.to(halfP).lookTo(p).startAnimation();
-                viewOne = true;
-            }
-            if (viewOne && intersects.length === 0) {
-                camera.to(new Vector3(0, 0, 0)).lookTo(new Vector3(viewOneTarget.x, 0, viewOneTarget.z)).startAnimation();
-                viewOne = false;
-            }
+            mouseDownNormal = {x, y};
         });
 
-        window.addEventListener("mouseup", () => {
+        window.addEventListener("mouseup", (event: MouseEvent) => {
             isMousedown = false;
+            
+            if (!isDrag) {
+                raycaster.setFromCamera(mouseDownNormal, camera);
+                const intersects = raycaster.intersectObjects(scene.children);
+    
+                if (intersects.length > 0) {
+                    if (selectedId !== intersects[0].object.id) {
+                        const p = intersects[0].object.position;
+                        viewOneTarget = new Vector3().copy(intersects[0].object.position);
+                        const halfP = new Vector3(p.x * 0.8, p.y, p.z * 0.8);
+    
+                        camera.to(halfP).lookTo(p).startAnimation();
+                        selectedId = intersects[0].object.id;
+                    }
+                }
+                if (selectedId !== null && intersects.length === 0) {
+                    camera.to(new Vector3(0, 0, 0)).lookTo(new Vector3(viewOneTarget.x, 0, viewOneTarget.z)).startAnimation();
+                    selectedId = null;
+                }
+            }
+            isDrag = false;
         });
 
         window.addEventListener("mousemove", (event: MouseEvent) => {
-            if (isMousedown && !viewOne) {
-                camera.rotation.y += event.movementX * 0.001;
-                camera.updateProjectionMatrix();
+            if (isMousedown) {
+                isDrag = true;
+                if (selectedId === null) {
+                    camera.rotation.y += event.movementX * 0.001;
+                }
             }
         });
     };
