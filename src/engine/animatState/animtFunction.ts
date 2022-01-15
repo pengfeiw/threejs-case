@@ -1,6 +1,6 @@
 
 import {LinearFunction, QuadraticFunction} from "../mathFunction";
-export type AnimatFunc = "LINEAR" | "Quadratic";
+export type AnimatFunc = "LINEAR" | "QUADRATIC";
 
 /**
  * 获取值
@@ -12,7 +12,7 @@ const getValue = (et: number, start = 0, end = 1, func: AnimatFunc = "LINEAR") =
     switch (func) {
         case "LINEAR":
             return getValueByLinear(et, start, end);
-        case "Quadratic":
+        case "QUADRATIC":
             return getValueByQuadratic(et, start, end);
         default:
             return 0;

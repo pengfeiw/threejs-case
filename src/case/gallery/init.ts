@@ -24,6 +24,7 @@ const init = (canvas: HTMLCanvasElement) => {
     const raycaster = new Raycaster();
 
     const camera = new AnimatCamera(45, 1, 0.1, 10000);
+    camera.rotation.order = "XZY";
     camera.position.set(0, 0, 0);
 
     const createImages = () => {
@@ -88,17 +89,17 @@ const init = (canvas: HTMLCanvasElement) => {
 
         window.addEventListener("mouseup", (event: MouseEvent) => {
             isMousedown = false;
-            
+
             if (!isDrag) {
                 raycaster.setFromCamera(mouseDownNormal, camera);
                 const intersects = raycaster.intersectObjects(scene.children);
-    
+
                 if (intersects.length > 0) {
                     if (selectedId !== intersects[0].object.id) {
                         const p = intersects[0].object.position;
                         viewOneTarget = new Vector3().copy(intersects[0].object.position);
                         const halfP = new Vector3(p.x * 0.8, p.y, p.z * 0.8);
-    
+
                         camera.to(halfP).lookTo(p).startAnimation();
                         selectedId = intersects[0].object.id;
                     }
@@ -116,6 +117,10 @@ const init = (canvas: HTMLCanvasElement) => {
                 isDrag = true;
                 if (selectedId === null) {
                     camera.rotation.y += event.movementX * 0.001;
+
+                    // console.log("camera.up", camera.up.x, camera.up.y, camera.up.z);
+                    console.log("camera.rotation", camera.rotation);
+                    console.log("camera.rotation.order", camera.rotation.order);
                 }
             }
         });

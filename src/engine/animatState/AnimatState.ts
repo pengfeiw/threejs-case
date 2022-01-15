@@ -13,7 +13,7 @@ const cloneAnimateObject = (obj: AnimateObject) => {
 }
 
 class AnimatState {
-    private animatFunction: AnimatFunc = "LINEAR";
+    private animatFunction: AnimatFunc = "QUADRATIC";
     private _object: AnimateObject;
     private _endState: AnimateObject = {};
     private _startState: AnimateObject = {};

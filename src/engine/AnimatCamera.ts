@@ -1,4 +1,4 @@
-import {Camera, PerspectiveCamera, Vector3} from "three";
+import {PerspectiveCamera, Vector3} from "three";
 import AnimatState from "./animatState/AnimatState";
 
 class AnimatCamera extends PerspectiveCamera {
@@ -48,9 +48,6 @@ class AnimatCamera extends PerspectiveCamera {
         const res1 = this.animatState.position?.update(time);
         const res2 = this.animatState.lookAt?.update(time);
 
-        if (res1 || res2) {
-            this.updateProjectionMatrix();
-        }
         return res1 || res2;
     }
 }
