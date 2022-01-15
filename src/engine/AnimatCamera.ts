@@ -1,73 +1,57 @@
-import {PerspectiveCamera, Vector3} from "three";
-import AnimatState3 from "./animatState/AnimatState3";
+import {Camera, PerspectiveCamera, Vector3} from "three";
+import AnimatState from "./animatState/AnimatState";
 
 class AnimatCamera extends PerspectiveCamera {
     private _inAnimation: boolean = false;
     public get inAnimation() {
         return this._inAnimation;
     }
-    private startTime = 0;
     private animatState: {
-        position: {
-            active: boolean;
-            value: AnimatState3;
-        };
-        target: {
-            active: boolean;
-            value: AnimatState3;
-        };
+        position: AnimatState;
+        lookAt: AnimatState;
     };
     public constructor(fov?: number, aspect?: number, near?: number, far?: number) {
         super(fov, aspect, near, far);
-
         this.animatState = {
-            position: {
-                active: false,
-                value: new AnimatState3(this.position)
-            },
-            target: {
-                active: false,
-                value: new AnimatState3(new Vector3())
-            }
+            position: new AnimatState({x: 0, y: 0, z: 0}),
+            lookAt: new AnimatState({x: 0, y: 0, z: 0})
         };
     }
 
-    private updatePosition() {
-        this.position.copy(this.animatState.position.value.state);
+    public to(position: Vector3) {
+        this.animatState.position.to({x: position.x, y: position.y, z: position.z}).onUpdate((obj) => {
+            this.position.x = obj.x;
+            this.position.y = obj.y;
+            this.position.z = obj.z;
+        });
+        return this;
     }
 
-    private updateTarget() {
-        this.lookAt(this.animatState.target.value.state);
+    public lookTo(target: Vector3) {
+        const vector = new Vector3(0, 0, -1);
+        vector.applyQuaternion(this.quaternion);
+        const oldTarget = this.position.clone().add(vector);
+        this.animatState.lookAt = new AnimatState({x: oldTarget.x, y: oldTarget.y, z: oldTarget.z});
+        this.animatState.lookAt.to({x: target.x, y: target.y, z: target.z}).onUpdate((obj) => {
+            this.lookAt(new Vector3(obj.x, obj.y, obj.z));
+        });
+
+        return this;
     }
 
-    public setAnimatPosition(end: Vector3) {
-        this.animatState.position.active = true;
-        this.animatState.position.value.end.copy(end);
+    public startAnimation() {
+        this.animatState.position?.start();
+        this.animatState.lookAt?.start();
     }
 
-    public setAnimatTarget(end: Vector3) {
-        this.animatState.target.active = true;
-        this.animatState.target.value.end.copy(end);
-    }
+    public updateAnimation(time: number) {
+        const res1 = this.animatState.position?.update(time);
+        const res2 = this.animatState.lookAt?.update(time);
 
-    public startAnimation(startTime: number) {
-        this.animatState.position.value.start.copy(this.position);
-        this._inAnimation = true;
-    }
-
-    public endAnimation() {
-        this._inAnimation = false;
-    }
-
-    public update(time: number) {
-        if (this.inAnimation) {
-            const t = time - this.startTime;
-            this.animatState.position.value.update(t);
-            this.animatState.target.value.update(t);
-
-            this.updatePosition();
-            this.updateTarget();
+        if (res1 || res2) {
+            this.updateProjectionMatrix();
         }
+        return res1 || res2;
     }
 }
 

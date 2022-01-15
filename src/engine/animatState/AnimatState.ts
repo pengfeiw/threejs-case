@@ -24,6 +24,9 @@ class AnimatState {
     private get _endTime() {
         return this._startTime + this._duration;
     }
+    public get state() {
+        return this._object;
+    }
     public constructor(obj: AnimateObject, animatFunc?: AnimatFunc) {
         this._object = obj;
         if (animatFunc) {
@@ -58,12 +61,12 @@ class AnimatState {
 
     public update(time: number = Date.now()) {
         if (!this._start) {
-            return;
+            return false;
         }
 
         if (this._startTime === -1) {
             this._startTime = time;
-            return;
+            return false;
         }
 
         if (time >= this._endTime) {

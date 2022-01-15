@@ -1,22 +1,16 @@
 import {
-    BoxGeometry,
     Mesh,
     Color,
-    PerspectiveCamera,
     Scene,
     Vector3,
     WebGLRenderer,
-    MeshPhongMaterial,
-    DirectionalLight,
-    AmbientLight,
     Raycaster,
     TextureLoader,
     LoadingManager,
     MeshBasicMaterial,
     PlaneGeometry
 } from "three";
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
-import AnimatState from "src/engine/animatState/AnimatState";
+import AnimatCamera from "src/engine/AnimatCamera";
 
 const init = (canvas: HTMLCanvasElement) => {
     const renderer = new WebGLRenderer({
@@ -29,16 +23,8 @@ const init = (canvas: HTMLCanvasElement) => {
 
     const raycaster = new Raycaster();
 
-    const camera = new PerspectiveCamera(45, 1, 0.1, 10000);
+    const camera = new AnimatCamera(45, 1, 0.1, 10000);
     camera.position.set(0, 0, 0);
-
-    // const orbitControls = new OrbitControls(camera, canvas);
-    // orbitControls.update();
-
-    const pos = {x: camera.position.x, y: camera.position.y};
-    const animateState = new AnimatState(pos);
-
-    const cubes: Mesh[] = [];
 
     const createImages = () => {
         const loadManager = new LoadingManager();
@@ -52,9 +38,9 @@ const init = (canvas: HTMLCanvasElement) => {
         }
 
         loadManager.onLoad = () => {
-            const h = 10, vSpace = 10;
+            const h = 10, vSpace = 5;
             const row = 5, column = 30;
-            const radius = 120;
+            const radius = 80;
             const totalH = row * h + (row - 1) * vSpace;
             for (let i = 0; i < row; i++) {
                 for (let j = 0; j < column; j++) {
@@ -85,28 +71,31 @@ const init = (canvas: HTMLCanvasElement) => {
         renderer.setSize(window.innerWidth, window.innerHeight);
     };
 
-    const mousedown = (event: MouseEvent) => {
-        const x = (event.clientX / window.innerWidth) * 2 - 1;
-        const y = - (event.clientY / window.innerHeight) * 2 + 1;
-
-        raycaster.setFromCamera({x, y}, camera);
-
-        const intersects = raycaster.intersectObjects(cubes);
-
-        if (intersects.length > 0) {
-            animateState.to({x: intersects[0].object.position.x, y: intersects[0].object.position.y}).onUpdate((obj) => {
-                camera.position.x = obj.x;
-                camera.position.y = obj.y;
-
-                console.log("camera.position", camera.position.x, camera.position.y);
-            }).start();
-        }
-    }
-
     const on = () => {
         let isMousedown = false;
-        window.addEventListener("mousedown", () => {
+        let mouseDownScreenPos = {x: 0, y: 0};
+        let viewOne = false;
+        let viewOneTarget = new Vector3();
+        window.addEventListener("mousedown", (event: MouseEvent) => {
             isMousedown = true;
+            mouseDownScreenPos = {x: event.offsetX, y: event.offsetY};
+            const x = (event.clientX / window.innerWidth) * 2 - 1;
+            const y = - (event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera({x, y}, camera);
+            const intersects = raycaster.intersectObjects(scene.children);
+
+            if (intersects.length > 0) {
+                const p = intersects[0].object.position;
+                viewOneTarget = new Vector3().copy(intersects[0].object.position);
+                const halfP = new Vector3(p.x * 0.8, p.y, p.z * 0.8);
+
+                camera.to(halfP).lookTo(p).startAnimation();
+                viewOne = true;
+            }
+            if (viewOne && intersects.length === 0) {
+                camera.to(new Vector3(0, 0, 0)).lookTo(new Vector3(viewOneTarget.x, 0, viewOneTarget.z)).startAnimation();
+                viewOne = false;
+            }
         });
 
         window.addEventListener("mouseup", () => {
@@ -114,7 +103,7 @@ const init = (canvas: HTMLCanvasElement) => {
         });
 
         window.addEventListener("mousemove", (event: MouseEvent) => {
-            if (isMousedown) {
+            if (isMousedown && !viewOne) {
                 camera.rotation.y += event.movementX * 0.001;
                 camera.updateProjectionMatrix();
             }
@@ -126,13 +115,11 @@ const init = (canvas: HTMLCanvasElement) => {
 
         resize();
         window.addEventListener("resize", resize);
-
-        window.addEventListener("mousedown", mousedown);
     };
 
     const render = (time: number) => {
         renderer.render(scene, camera);
-        animateState.update(time);
+        camera.updateAnimation(time);
         requestAnimationFrame(render);
     };
 
