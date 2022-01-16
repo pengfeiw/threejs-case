@@ -19,7 +19,7 @@ const init = (canvas: HTMLCanvasElement) => {
     });
 
     const scene = new Scene();
-    scene.background = new Color("black");
+    scene.background = new Color("#092133");
 
     const raycaster = new Raycaster();
 
@@ -60,7 +60,6 @@ const init = (canvas: HTMLCanvasElement) => {
                     scene.add(plane);
                 }
             }
-
         };
     };
 
@@ -75,19 +74,27 @@ const init = (canvas: HTMLCanvasElement) => {
     const on = () => {
         let isMousedown = false;
         let isDrag = false;
-        let mouseDownScreenPos = {x: 0, y: 0};
         let selectedId: number | null = null;
         let viewOneTarget = new Vector3();
         let mouseDownNormal = {x: 0, y: 0};
-        window.addEventListener("mousedown", (event: MouseEvent) => {
-            isMousedown = true;
-            mouseDownScreenPos = {x: event.offsetX, y: event.offsetY};
-            const x = (event.clientX / window.innerWidth) * 2 - 1;
-            const y = - (event.clientY / window.innerHeight) * 2 + 1;
-            mouseDownNormal = {x, y};
-        });
+        let prepos = {x: 0, y: 0};
 
-        window.addEventListener("mouseup", (event: MouseEvent) => {
+        const getTouchPos = (event: TouchEvent): {x: number; y: number} => {
+            return {
+                x: event.touches[0].pageX - canvas.offsetLeft,
+                y: event.touches[0].pageY - canvas.offsetTop
+            }
+        };
+
+        const mousedownHandle = (clientX: number, clientY: number) => {
+            const x = (clientX / window.innerWidth) * 2 - 1;
+            const y = - (clientY / window.innerHeight) * 2 + 1;
+            isMousedown = true;
+            
+            mouseDownNormal = {x, y};
+        };
+
+        const mouseupHandle = () => {
             isMousedown = false;
 
             if (!isDrag) {
@@ -110,27 +117,66 @@ const init = (canvas: HTMLCanvasElement) => {
                 }
             }
             isDrag = false;
-        });
-
-        window.addEventListener("mousemove", (event: MouseEvent) => {
+        };
+        const mousemoveHandle = (movementX: number) => {
             if (isMousedown) {
                 isDrag = true;
                 if (selectedId === null) {
-                    camera.rotation.y += event.movementX * 0.001;
-
-                    // console.log("camera.up", camera.up.x, camera.up.y, camera.up.z);
-                    console.log("camera.rotation", camera.rotation);
-                    console.log("camera.rotation.order", camera.rotation.order);
+                    camera.rotation.y += movementX * 0.001;
                 }
             }
+        };
+
+        window.addEventListener("mousedown", (event: MouseEvent) => {
+            event.preventDefault();
+            mousedownHandle(event.offsetX, event.offsetY);
         });
+
+        window.addEventListener("mouseup", (event) => {
+            event.preventDefault();
+            mouseupHandle();
+        });
+
+        window.addEventListener("mousemove", (event: MouseEvent) => {
+            event.preventDefault();
+            mousemoveHandle(event.movementX);
+        });
+
+
+        window.addEventListener("touchstart", (event: TouchEvent) => {
+            if (event.cancelable) {
+                event.preventDefault();
+            }
+            const touchPos = getTouchPos(event);
+            prepos = {...touchPos};
+            mousedownHandle(touchPos.x, touchPos.y);
+        });
+
+        window.addEventListener("touchmove", (event) => {
+            if (event.cancelable) {
+                event.preventDefault();
+            }
+            const touchPos = getTouchPos(event);
+            mousemoveHandle(touchPos.x - prepos.x);
+            prepos = {...touchPos};
+        });
+
+        window.addEventListener("touchend", (event: TouchEvent) => {
+            if (event.cancelable) {
+                event.preventDefault();
+            }
+
+            mouseupHandle();
+        });
+
+        window.addEventListener("resize", resize);
     };
 
     const setup = () => {
         createImages();
 
         resize();
-        window.addEventListener("resize", resize);
+
     };
 
     const render = (time: number) => {
