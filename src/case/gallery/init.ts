@@ -11,6 +11,7 @@ import {
     PlaneGeometry
 } from "three";
 import AnimatCamera from "src/engine/AnimatCamera";
+import {getPathWithPrefix} from "src/util";
 
 const init = (canvas: HTMLCanvasElement) => {
     const renderer = new WebGLRenderer({
@@ -34,7 +35,7 @@ const init = (canvas: HTMLCanvasElement) => {
         const materials: MeshBasicMaterial[] = [];
         for (let i = 0; i < 20; i++) {
             materials.push(new MeshBasicMaterial({
-                map: textureLoader.load(`/images/gallery/${i + 1}.jpg`)
+                map: textureLoader.load(getPathWithPrefix(`/images/gallery/${i + 1}.jpg`))
             }));
         }
 
@@ -90,7 +91,7 @@ const init = (canvas: HTMLCanvasElement) => {
             const x = (clientX / window.innerWidth) * 2 - 1;
             const y = - (clientY / window.innerHeight) * 2 + 1;
             isMousedown = true;
-            
+
             mouseDownNormal = {x, y};
         };
 

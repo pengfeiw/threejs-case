@@ -10,8 +10,8 @@ const Home: NextPage = () => {
                     <ol>
                         <li>
                             gallery:
-                            <a href="https://pengfewi.github.io/threejs-case/gallery">
-                                https://pengfewi.github.io/threejs-case/gallery
+                            <a href="https://pengfeiw.github.io/threejs-case/gallery">
+                                https://pengfeiw.github.io/threejs-case/gallery
                             </a>
                         </li>
                     </ol>
