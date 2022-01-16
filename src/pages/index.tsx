@@ -11,6 +11,11 @@ const Home: NextPage = () => {
         >
             <H1>Threejs Case</H1>
             <Paragraph>使用 ThreeJs 写的一些小程序。</Paragraph>
+            <H2>Source</H2>
+            <Paragraph>
+                github： 
+                <Link href="https://github.com/pengfeiw/threejs-case">https://github.com/pengfeiw/threejs-case</Link>
+            </Paragraph>
             <H2>Case</H2>
             <OrderedList>
                 <ListItem>

@@ -13,7 +13,7 @@ import {
 import AnimatCamera from "src/engine/AnimatCamera";
 import {getPathWithPrefix} from "src/util";
 
-const init = (canvas: HTMLCanvasElement) => {
+const init = (canvas: HTMLCanvasElement, loadCallback?: () => void) => {
     const renderer = new WebGLRenderer({
         antialias: true,
         canvas
@@ -40,6 +40,9 @@ const init = (canvas: HTMLCanvasElement) => {
         }
 
         loadManager.onLoad = () => {
+            if (loadCallback) {
+                loadCallback();
+            }
             const h = 10, vSpace = 5;
             const row = 5, column = 30;
             const radius = 80;
