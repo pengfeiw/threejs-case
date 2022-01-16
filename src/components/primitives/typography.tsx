@@ -1,0 +1,58 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+import React from "react"
+import {
+    Text,
+    useColorMode,
+    BoxProps,
+    Heading as ChakraHeading,
+    HeadingProps as ChakraHeadingProps,
+} from "@chakra-ui/react"
+
+const headingColors = {
+    light: "gray.900",
+    dark: "gray.200"
+}
+
+export interface HeadingProps extends ChakraHeadingProps {
+    linkable?: boolean
+}
+
+const Heading: React.FC<HeadingProps> = ({
+    linkable = false,
+    children,
+    ...props
+}) => {
+    const {colorMode} = useColorMode()
+    return (
+        <ChakraHeading
+            mt={8}
+            mb={6}
+            lineHeight={1.25}
+            color={headingColors[colorMode]}
+            css={
+                linkable
+                    ? {
+                        scrollMarginTop: "100px",
+                        scrollSnapMargin: "100px", // Safari
+                        "&[id]:hover a": {opacity: 0.25},
+                        "&[id]:hover a:hover": {opacity: 1}
+                    }
+                    : {}
+            }
+            textStyle={props.as as string}
+            {...props}
+        >
+            {children}
+        </ChakraHeading>
+    )
+}
+
+type P = HeadingProps
+
+export const H1: React.FC<P> = p => <Heading as="h1" size="xl" {...p} />
+export const H2: React.FC<P> = p => <Heading as="h2" size="lg" {...p} />
+export const H3: React.FC<P> = p => <Heading as="h3" size="md" {...p} />
+export const H4: React.FC<P> = p => <Heading as="h4" size="sm" {...p} />
+export const H5: React.FC<P> = p => <Heading as="h5" size="xs" {...p} />
+export const H6: React.FC<P> = p => <Heading as="h6" size="2xs" {...p} />
+export const Paragraph = (p: BoxProps) => <Text as="p" mb={8} {...p} />
