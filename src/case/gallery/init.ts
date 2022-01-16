@@ -73,6 +73,7 @@ const init = (canvas: HTMLCanvasElement, loadCallback?: () => void) => {
         camera.updateProjectionMatrix();
 
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
     };
 
     const on = () => {
