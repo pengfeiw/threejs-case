@@ -8,7 +8,7 @@ import {
     TextureLoader,
     LoadingManager,
     MeshBasicMaterial,
-    PlaneGeometry
+    PlaneBufferGeometry
 } from "three";
 import AnimatCamera from "src/engine/AnimatCamera";
 import {getPathWithPrefix} from "src/util";
@@ -33,7 +33,7 @@ const init = (canvas: HTMLCanvasElement, loadCallback?: () => void) => {
         const textureLoader = new TextureLoader(loadManager);
 
         const materials: MeshBasicMaterial[] = [];
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 10; i++) {
             materials.push(new MeshBasicMaterial({
                 map: textureLoader.load(getPathWithPrefix(`/images/gallery/${i + 1}.jpg`))
             }));
@@ -47,16 +47,14 @@ const init = (canvas: HTMLCanvasElement, loadCallback?: () => void) => {
             const row = 5, column = 30;
             const radius = 80;
             const totalH = row * h + (row - 1) * vSpace;
+            const geo = new PlaneBufferGeometry(h, h);
             for (let i = 0; i < row; i++) {
                 for (let j = 0; j < column; j++) {
                     const y = -totalH * 0.5 + i * (h + vSpace) + h * 0.5;
                     const radians = Math.PI * 2 / column * j;
                     const x = Math.sin(radians) * radius;
                     const z = Math.cos(radians) * radius;
-
-                    const geo = new PlaneGeometry(h, h);
-                    const mat = materials[Math.floor(Math.random() * 20)];
-
+                    const mat = materials[Math.floor(Math.random() * materials.length)];
                     const plane = new Mesh(geo, mat);
                     plane.position.set(x, y, z);
                     plane.lookAt(0, y, 0);
@@ -83,6 +81,7 @@ const init = (canvas: HTMLCanvasElement, loadCallback?: () => void) => {
         let viewOneTarget = new Vector3();
         let mouseDownNormal = {x: 0, y: 0};
         let prepos = {x: 0, y: 0};
+        let downPos = {x: 0, y: 0};
 
         const getTouchPos = (event: TouchEvent): {x: number; y: number} => {
             return {
@@ -134,6 +133,7 @@ const init = (canvas: HTMLCanvasElement, loadCallback?: () => void) => {
 
         window.addEventListener("mousedown", (event: MouseEvent) => {
             event.preventDefault();
+            downPos = {x: event.offsetX, y: event.offsetY};
             mousedownHandle(event.offsetX, event.offsetY);
         });
 
@@ -144,15 +144,18 @@ const init = (canvas: HTMLCanvasElement, loadCallback?: () => void) => {
 
         window.addEventListener("mousemove", (event: MouseEvent) => {
             event.preventDefault();
-            mousemoveHandle(event.movementX);
+            const distance = Math.sqrt(Math.pow(event.offsetX - downPos.x, 2) + Math.pow(event.offsetY - downPos.y, 2));
+            if (distance > 0.1) {
+                mousemoveHandle(event.movementX);
+            }
         });
-
 
         window.addEventListener("touchstart", (event: TouchEvent) => {
             if (event.cancelable) {
                 event.preventDefault();
             }
             const touchPos = getTouchPos(event);
+            downPos = {...touchPos};
             prepos = {...touchPos};
             mousedownHandle(touchPos.x, touchPos.y);
         });
@@ -162,7 +165,11 @@ const init = (canvas: HTMLCanvasElement, loadCallback?: () => void) => {
                 event.preventDefault();
             }
             const touchPos = getTouchPos(event);
-            mousemoveHandle(touchPos.x - prepos.x);
+
+            const distance = Math.sqrt(Math.pow(touchPos.x - downPos.x, 2) + Math.pow(touchPos.y - downPos.y, 2));
+            if (distance > 0.1) {
+                mousemoveHandle(touchPos.x - prepos.x);
+            }
             prepos = {...touchPos};
         });
 
