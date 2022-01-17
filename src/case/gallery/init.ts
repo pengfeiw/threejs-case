@@ -13,7 +13,7 @@ import {
 import AnimatCamera from "src/engine/AnimatCamera";
 import {getPathWithPrefix} from "src/util";
 
-const init = (canvas: HTMLCanvasElement, loadCallback?: () => void) => {
+const init = (canvas: HTMLCanvasElement) => {
     const renderer = new WebGLRenderer({
         antialias: true,
         canvas
@@ -39,30 +39,25 @@ const init = (canvas: HTMLCanvasElement, loadCallback?: () => void) => {
             }));
         }
 
-        loadManager.onLoad = () => {
-            if (loadCallback) {
-                loadCallback();
-            }
-            const h = 10, vSpace = 5;
-            const row = 5, column = 30;
-            const radius = 80;
-            const totalH = row * h + (row - 1) * vSpace;
-            const geo = new PlaneBufferGeometry(h, h);
-            for (let i = 0; i < row; i++) {
-                for (let j = 0; j < column; j++) {
-                    const y = -totalH * 0.5 + i * (h + vSpace) + h * 0.5;
-                    const radians = Math.PI * 2 / column * j;
-                    const x = Math.sin(radians) * radius;
-                    const z = Math.cos(radians) * radius;
-                    const mat = materials[Math.floor(Math.random() * materials.length)];
-                    const plane = new Mesh(geo, mat);
-                    plane.position.set(x, y, z);
-                    plane.lookAt(0, y, 0);
+        const h = 10, vSpace = 5;
+        const row = 5, column = 30;
+        const radius = 80;
+        const totalH = row * h + (row - 1) * vSpace;
+        const geo = new PlaneBufferGeometry(h, h);
+        for (let i = 0; i < row; i++) {
+            for (let j = 0; j < column; j++) {
+                const y = -totalH * 0.5 + i * (h + vSpace) + h * 0.5;
+                const radians = Math.PI * 2 / column * j;
+                const x = Math.sin(radians) * radius;
+                const z = Math.cos(radians) * radius;
+                const mat = materials[Math.floor(Math.random() * materials.length)];
+                const plane = new Mesh(geo, mat);
+                plane.position.set(x, y, z);
+                plane.lookAt(0, y, 0);
 
-                    scene.add(plane);
-                }
+                scene.add(plane);
             }
-        };
+        }
     };
 
     const resize = () => {
