@@ -1,6 +1,6 @@
-import {Spinner, Flex} from "@chakra-ui/react";
+import {Flex} from "@chakra-ui/react";
 import type {NextPage} from "next";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useRef} from "react";
 import init from "src/case/gallery/init";
 
 const Gallery: NextPage = () => {

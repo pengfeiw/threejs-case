@@ -14,23 +14,17 @@ module.exports = {
             {
                 test: /\.(glsl|fs|vs)$/,
                 exclude: /node_modules/,
-                use: {
-                    loader: "glslify-import-loader",
-                }
+                use: "glslify-import-loader",
             },
             {
                 test: /\.(glsl|fs|vs)$/,
                 exclude: /node_modules/,
-                use: {
-                    loader: "raw-loader",
-                }
+                use: "raw-loader"
             },
             {
                 test: /\.(glsl|fs|vs)$/,
                 exclude: /node_modules/,
-                use: {
-                    loader: "glslify-loader",
-                }
+                use: "glslify-loader",
             }
         ]
     }

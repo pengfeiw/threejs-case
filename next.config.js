@@ -12,5 +12,8 @@ const nextconfig = {
 
 module.exports = withPlugins(
     [],
-    merge(nextconfig, {webpack: webpackconfig})
+    {
+        ...nextconfig,
+        webpack: (config, options) => merge(config, webpackconfig)
+    }
 );
