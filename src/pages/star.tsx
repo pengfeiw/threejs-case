@@ -1,8 +1,8 @@
 import type {NextPage} from "next";
 import {useEffect, useRef} from "react";
-import init from "src/case/torch/init";
+import init from "src/case/star/init";
 
-const Torch: NextPage = () => {
+const Star: NextPage = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -15,4 +15,4 @@ const Torch: NextPage = () => {
     return <canvas ref={canvasRef}></canvas>
 };
 
-export default Torch;
+export default Star;
