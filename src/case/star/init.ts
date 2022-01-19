@@ -106,7 +106,7 @@ const createParticles = () => {
         positions.push((Math.random() * 2 - 1) * radius);
         positions.push((Math.random() * 2 - 1) * radius);
 
-        color.setHSL(i / particles, 0.8, 0.7);
+        color.setHSL(i / particles, 0.6, 0.7);
 
         colors.push(color.r, color.g, color.b);
 
