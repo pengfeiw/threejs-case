@@ -7,3 +7,5 @@
 建议使用谷歌浏览器查看。
 
 1. gallery: [https://pengfeiw.github.io/threejs-case/gallery](https://pengfeiw.github.io/threejs-case/gallery)
+
+2. gallery: [https://pengfeiw.github.io/threejs-case/star](https://pengfeiw.github.io/threejs-case/star)
