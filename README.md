@@ -8,4 +8,4 @@
 
 1. gallery: [https://pengfeiw.github.io/threejs-case/gallery](https://pengfeiw.github.io/threejs-case/gallery)
 
-2. gallery: [https://pengfeiw.github.io/threejs-case/star](https://pengfeiw.github.io/threejs-case/star)
+2. star: [https://pengfeiw.github.io/threejs-case/star](https://pengfeiw.github.io/threejs-case/star)
