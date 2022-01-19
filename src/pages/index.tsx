@@ -22,6 +22,10 @@ const Home: NextPage = () => {
                     Gallery：
                     <Link href={getPathWithPrefix("/gallery")}>https://pengfeiw.github.io/threejs-case/gallery</Link>
                 </ListItem>
+                <ListItem>
+                    Star：
+                    <Link href={getPathWithPrefix("/star")}>https://pengfeiw.github.io/threejs-case/star</Link>
+                </ListItem>
             </OrderedList>
         </Box>
     );
