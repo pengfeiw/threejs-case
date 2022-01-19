@@ -8,29 +8,30 @@ import {
     Scene,
     ShaderMaterial,
     Texture,
-    WebGLRenderer,
-    BoxGeometry,
-    MeshBasicMaterial,
-    Mesh
+    WebGLRenderer
 } from "three";
 import fs from "./points.fs";
 import vs from "./points.vs";
 import Points from "src/engine/object/Points";
 import {resize} from "src/engine/threeUtil";
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import * as MathUtil from "src/util/math";
 
 let camera: PerspectiveCamera;
 let scene: Scene;
 let renderer: WebGLRenderer;
 let geometry: BufferGeometry;
 const particles = 1000;
-const sizes: number[] = [];
 
+let mouseposition: {x: number; y: number};
 const on = () => {
     window.addEventListener("resize", () => {
         resize(camera, renderer);
     });
-}
+
+    window.addEventListener("mousemove", (event) => {
+        mouseposition = {x: event.offsetX, y: event.offsetY};
+    });
+};
 
 const createTexture = function () {
     var canvas = document.createElement("canvas");
@@ -99,7 +100,7 @@ const createParticles = () => {
     const positions = [];
     const colors = [];
     const color = new Color();
-
+    const sizes = [];
     for (let i = 0; i < particles; i++) {
         positions.push((Math.random() * 2 - 1) * radius);
         positions.push((Math.random() * 2 - 1) * radius);
@@ -118,7 +119,7 @@ const createParticles = () => {
 
     particleSystem.setAttributes("position", new Float32BufferAttribute(positions, 3));
     particleSystem.setAttributes("color", new Float32BufferAttribute(colors, 3));
-    particleSystem.setAttributes("size", new Float32BufferAttribute([...sizes], 1));
+    particleSystem.setAttributes("size", new Float32BufferAttribute(sizes, 1));
 
     particleSystem.setUniforms("pointTexture", {value: createTexture()});
 
@@ -137,6 +138,16 @@ const animate = () => {
 
     geometry.attributes.size.needsUpdate = true;
 
+    if (mouseposition) {
+        const h = (mouseposition.x - window.innerWidth * 0.5) / (window.innerWidth * 0.5);
+        const v = (mouseposition.y - window.innerHeight * 0.5) / (window.innerHeight * 0.5);
+        camera.rotation.x -= 0.01 * v;
+        camera.rotation.y -= 0.01 * h;
+
+        camera.rotation.x = MathUtil.clamp(camera.rotation.x, -Math.PI * 0.25, Math.PI * 0.25);
+        camera.rotation.y = MathUtil.clamp(camera.rotation.y, -Math.PI * 0.25, Math.PI * 0.25);
+    }
+
     renderer.render(scene, camera);
 };
 
@@ -148,13 +159,10 @@ const init = (canvas: HTMLCanvasElement) => {
 
     scene = new Scene();
     camera = new PerspectiveCamera(45, 1, 20, 100);
-    camera.position.set(0, 0, 0.1);
+    camera.position.set(0, 0, 0);
 
     createParticles();
     resize(camera, renderer);
-
-    const controls = new OrbitControls(camera, canvas);
-    controls.update();
 
     on();
 
