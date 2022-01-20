@@ -20,7 +20,7 @@ let camera: PerspectiveCamera;
 let scene: Scene;
 let renderer: WebGLRenderer;
 let geometry: BufferGeometry;
-const particles = 1000;
+const particles = 3000;
 
 let mouseposition: {x: number; y: number};
 const on = () => {
@@ -93,8 +93,6 @@ const createParticles = () => {
 
     shaderMaterial.uniforms["pointTexture"] = {value: createTexture()};
 
-    const radius = 50;
-
     geometry = new BufferGeometry();
 
     const positions = [];
@@ -102,9 +100,14 @@ const createParticles = () => {
     const color = new Color();
     const sizes = [];
     for (let i = 0; i < particles; i++) {
-        positions.push((Math.random() * 2 - 1) * radius);
-        positions.push((Math.random() * 2 - 1) * radius);
-        positions.push((Math.random() * 2 - 1) * radius);
+        const rad1 = MathUtil.degree2Radian(MathUtil.randomInt(0, 360));
+        const rad2 = MathUtil.degree2Radian(MathUtil.randomInt(-90, 90));
+        const radius = MathUtil.randomInt(50, 100);
+        const pos = MathUtil.spherical2Cartesian(rad1, rad2, radius);
+
+        positions.push(pos.x);
+        positions.push(pos.y);
+        positions.push(pos.z);
 
         color.setHSL(i / particles, 0.6, 0.7);
 
@@ -160,7 +163,7 @@ const init = (canvas: HTMLCanvasElement) => {
     scene = new Scene();
     camera = new PerspectiveCamera(45, 1, 20, 100);
     camera.position.set(0, 0, 0);
-
+    
     createParticles();
     resize(camera, renderer);
 
