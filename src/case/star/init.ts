@@ -1,14 +1,11 @@
 import {
-    AdditiveBlending,
     Float32BufferAttribute,
     BufferGeometry,
     Color,
-    NearestFilter,
     PerspectiveCamera,
     Scene,
-    ShaderMaterial,
-    Texture,
-    WebGLRenderer
+    WebGLRenderer,
+    CanvasTexture
 } from "three";
 import fs from "./points.fs";
 import vs from "./points.vs";
@@ -74,27 +71,11 @@ const createTexture = function () {
     ctx.closePath();
     ctx.fill();
 
-    texture = new Texture(canvas);
-    texture.minFilter = NearestFilter;
-    texture.needsUpdate = true;
+    texture = new CanvasTexture(ctx.canvas);
     return texture;
 };
 
 const createParticles = () => {
-    const shaderMaterial = new ShaderMaterial({
-        vertexShader: vs,
-        fragmentShader: fs,
-
-        blending: AdditiveBlending,
-        depthTest: false,
-        transparent: true,
-        vertexColors: true
-    });
-
-    shaderMaterial.uniforms["pointTexture"] = {value: createTexture()};
-
-    geometry = new BufferGeometry();
-
     const positions = [];
     const colors = [];
     const color = new Color();
@@ -123,7 +104,6 @@ const createParticles = () => {
     particleSystem.setAttributes("position", new Float32BufferAttribute(positions, 3));
     particleSystem.setAttributes("color", new Float32BufferAttribute(colors, 3));
     particleSystem.setAttributes("size", new Float32BufferAttribute(sizes, 1));
-
     particleSystem.setUniforms("pointTexture", {value: createTexture()});
 
     scene.add(particleSystem);
@@ -144,8 +124,8 @@ const animate = () => {
     if (mouseposition) {
         const h = (mouseposition.x - window.innerWidth * 0.5) / (window.innerWidth * 0.5);
         const v = (mouseposition.y - window.innerHeight * 0.5) / (window.innerHeight * 0.5);
-        camera.rotation.x -= 0.01 * v;
-        camera.rotation.y -= 0.01 * h;
+        camera.rotation.x -= 0.005 * v;
+        camera.rotation.y -= 0.005 * h;
 
         camera.rotation.x = MathUtil.clamp(camera.rotation.x, -Math.PI * 0.25, Math.PI * 0.25);
         camera.rotation.y = MathUtil.clamp(camera.rotation.y, -Math.PI * 0.25, Math.PI * 0.25);
