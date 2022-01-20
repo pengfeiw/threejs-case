@@ -8,6 +8,7 @@ const Home: NextPage = () => {
         <Box
             maxW={1000}
             m="0 auto"
+            padding="10px"
         >
             <H1>Threejs Case</H1>
             <Paragraph>使用 ThreeJs 写的一些小程序。</Paragraph>
