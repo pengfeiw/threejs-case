@@ -1,7 +1,7 @@
 import {BackSide, BufferAttribute, Group, CanvasTexture, Color, OctahedronGeometry, TextureLoader, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PointLight, Scene, Vector3, WebGLRenderer, CylinderBufferGeometry} from "three";
 import Points from "src/engine/object/Points";
-import fs from "./.fs";
-import vs from "./.vs";
+import fs from "./torch.fs";
+import vs from "./torch.vs";
 import {resize} from "src/engine/threeUtil";
 import * as MathUtil from "src/util/math";
 import AnimatPoint from "./AnimatPoint";
