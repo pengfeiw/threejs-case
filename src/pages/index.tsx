@@ -28,7 +28,7 @@ const Home: NextPage = () => {
                     <Link href={getPathWithPrefix("/star")}>https://pengfeiw.github.io/threejs-case/star</Link>
                 </ListItem>
                 <ListItem>
-                    Star：
+                    Torch：
                     <Link href={getPathWithPrefix("/torch")}>https://pengfeiw.github.io/threejs-case/torch</Link>
                 </ListItem>
             </OrderedList>
