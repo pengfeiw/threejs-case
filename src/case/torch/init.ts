@@ -1,51 +1,26 @@
-import {BufferAttribute, CanvasTexture, Color, PerspectiveCamera, Scene, WebGLRenderer} from "three";
+import {BufferAttribute, CanvasTexture, Color, PerspectiveCamera, Scene, Vector3, WebGLRenderer} from "three";
 import Points from "src/engine/object/Points";
 import fs from "./.fs";
 import vs from "./.vs";
 import {resize} from "src/engine/threeUtil";
 import * as MathUtil from "src/util/math";
+import AnimatPoint from "./AnimatPoint";
 
 let renderer: WebGLRenderer;
 let camera: PerspectiveCamera;
 let scene: Scene;
 let points: Points;
-let count = 5000;
+let count = 10000;
+const animatPoints: AnimatPoint[] = [];
 
 const position = new Float32Array(count * 3);
 const opacity = new Float32Array(count);
 const size = new Float32Array(count);
 
-const animation = () => {
+const animation = (time: number) => {
     requestAnimationFrame(animation);
 
-    for (let i = 0; i < count; i++) {
-        position[i * 3 + 1] += 0.3;
-        position[i * 3 + 0] += MathUtil.randomInt(-100, 100) / 100;
-        position[i * 3 + 2] += MathUtil.randomInt(-100, 100) / 100;
-    }
-
-    for (let i = 0; i < count; i++) {
-        size[i] -= 0.1;
-        opacity[i] -= 0.01;
-
-
-        if (size[i] < 0 || opacity[i] <= 0) {
-            const rad1 = MathUtil.randomInt(0, 360) / 180 * Math.PI;
-            const rad2 = MathUtil.randomInt(-90, 90) / 180 * Math.PI;
-            let radius = MathUtil.randomInt(0, 100);
-            const pos = MathUtil.spherical2Cartesian(rad1, rad2, radius);
-
-            position[i * 3 + 0] = pos.x;
-            position[i * 3 + 1] = pos.y;
-            position[i * 3 + 2] = pos.z;
-            opacity[i] = Math.random();
-            size[i] = MathUtil.randomInt(5, 50);
-        }
-    }
-
-
-    points.geometry.attributes.position.needsUpdate = true;
-    points.geometry.attributes.size.needsUpdate = true;
+    updateParticles(time);
     renderer.render(scene, camera);
 };
 
@@ -70,19 +45,31 @@ const createTexture = () => {
     return texture;
 };
 
-const initParticles = () => {
+const randomPoint = () => {
+    const rad1 = MathUtil.randomInt(0, 360) / 180 * Math.PI;
+    const rad2 = MathUtil.randomInt(-90, 90) / 180 * Math.PI;
+    let radius = MathUtil.randomInt(0, 100);
+    const pos = MathUtil.spherical2Cartesian(rad1, rad2, radius);
 
+    const point = new AnimatPoint(pos, Math.random(), MathUtil.randomInt(5, 50));
+
+    return point;
+}
+
+const initAnimatPoints = () => {
     for (let i = 0; i < count; i++) {
-        const rad1 = MathUtil.randomInt(0, 360) / 180 * Math.PI;
-        const rad2 = MathUtil.randomInt(-90, 90) / 180 * Math.PI;
-        let radius = MathUtil.randomInt(0, 100);
-        const pos = MathUtil.spherical2Cartesian(rad1, rad2, radius);
+        const point = randomPoint();
+        animatPoints.push(point);
+    }
+};
 
-        position[i * 3 + 0] = pos.x;
-        position[i * 3 + 1] = pos.y;
-        position[i * 3 + 2] = pos.z;
-        opacity[i] = Math.random();
-        size[i] = MathUtil.randomInt(5, 50);
+const initParticles = () => {
+    for (let i = 0; i < count; i++) {
+        position[i * 3 + 0] = animatPoints[i].position.x;
+        position[i * 3 + 1] = animatPoints[i].position.y;
+        position[i * 3 + 2] = animatPoints[i].position.z;
+        opacity[i] = animatPoints[i].opacity.value;
+        size[i] = animatPoints[i].size.value;
     }
 
     points = new Points(vs, fs, true, false);
@@ -93,9 +80,38 @@ const initParticles = () => {
     points.setUniforms("pointTexture", {value: createTexture()});
     points.setUniforms("color", {value: new Color("#f87510")});
 
-    points.geometry.attributes.position.needsUpdate = true;
-
     scene.add(points);
+};
+
+const updateParticles = (time: number) => {
+    for (let i = 0; i < animatPoints.length; i++) {
+        const point = animatPoints[i];
+
+        if (point.isStart) {
+            point.updateAnimation(time);
+            position[i * 3 + 0] = point.position.x;
+            position[i * 3 + 1] = point.position.y;
+            position[i * 3 + 2] = point.position.z;
+            opacity[i] = point.opacity.value;
+            size[i] = point.size.value;
+        } else if (point.isEnd) {
+            animatPoints[i] = randomPoint();
+        } else {
+            const rad1 = MathUtil.randomInt(0, 360) / 180 * Math.PI;
+            const rad2 = MathUtil.randomInt(45, 90) / 180 * Math.PI;
+            const len = MathUtil.randomInt(0, 200);
+            const move = MathUtil.spherical2Cartesian(rad1, rad2, len);
+
+            const duration = MathUtil.randomInt(1000, 3000);
+            point.to(new Vector3(point.position.x + move.x, point.position.y + move.y, point.position.z + move.z), duration)
+            .sizeTo(point.size.value * 0.5 , duration)
+            .opacityTo(0, duration).startAnimation();
+        }
+    }
+
+    points.geometry.attributes.position.needsUpdate = true;
+    points.geometry.attributes.size.needsUpdate = true;
+    points.geometry.attributes.opacity.needsUpdate = true;
 };
 
 const on = () => {
@@ -112,10 +128,10 @@ const init = (canvas: HTMLCanvasElement) => {
     camera = new PerspectiveCamera(45, 1, 0.1, 1000);
     camera.position.set(0, 0, 600);
     scene = new Scene();
-
+    initAnimatPoints();
     initParticles();
     on();
-    animation();
+    requestAnimationFrame(animation);
 };
 
 export default init;
