@@ -1,4 +1,4 @@
-import {BackSide, BufferAttribute, CanvasTexture, Color, OctahedronGeometry, DodecahedronBufferGeometry, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PointLight, Scene, Vector3, WebGLRenderer} from "three";
+import {BackSide, BufferAttribute, Group, CanvasTexture, Color, OctahedronGeometry, TextureLoader, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PointLight, Scene, Vector3, WebGLRenderer, CylinderBufferGeometry} from "three";
 import Points from "src/engine/object/Points";
 import fs from "./.fs";
 import vs from "./.vs";
@@ -6,6 +6,7 @@ import {resize} from "src/engine/threeUtil";
 import * as MathUtil from "src/util/math";
 import AnimatPoint from "./AnimatPoint";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import {getPathWithPrefix} from "src/util";
 
 let renderer: WebGLRenderer;
 let camera: PerspectiveCamera;
@@ -13,6 +14,8 @@ let scene: Scene;
 let points: Points;
 let count = 5000;
 let light: PointLight;
+const torch = new Group();
+const loader = new TextureLoader();
 const animatPoints: AnimatPoint[] = [];
 
 const position = new Float32Array(count * 3);
@@ -22,7 +25,7 @@ const size = new Float32Array(count);
 const animation = (time: number) => {
     requestAnimationFrame(animation);
 
-    updateParticles(time);
+    updateFire(time);
     renderer.render(scene, camera);
 };
 
@@ -65,7 +68,7 @@ const initAnimatPoints = () => {
     }
 };
 
-const initParticles = () => {
+const createFire = () => {
     for (let i = 0; i < count; i++) {
         position[i * 3 + 0] = animatPoints[i].position.x;
         position[i * 3 + 1] = animatPoints[i].position.y;
@@ -82,10 +85,10 @@ const initParticles = () => {
     points.setUniforms("pointTexture", {value: createTexture()});
     points.setUniforms("color", {value: new Color("#f87510")});
 
-    scene.add(points);
+    return points;
 };
 
-const updateParticles = (time: number) => {
+const updateFire = (time: number) => {
     for (let i = 0; i < animatPoints.length; i++) {
         const point = animatPoints[i];
 
@@ -116,7 +119,28 @@ const updateParticles = (time: number) => {
     points.geometry.attributes.opacity.needsUpdate = true;
 };
 
-const initBackground = () => {
+const createStick = () => {
+    const geo = new CylinderBufferGeometry(10, 10, 120);
+    const mat = new MeshBasicMaterial({
+        map: loader.load(getPathWithPrefix("/images/torch/wood.jpg"))
+    });
+
+    const stick = new Mesh(geo, mat);
+    return stick;
+};
+
+const addTorch = () => {
+    torch.add(createFire());
+    
+    const stick = createStick();
+    stick.position.set(0, -50, 0);
+
+    torch.add(stick);
+
+    scene.add(torch);
+};
+
+const addBackground = () => {
     var geometry = new OctahedronGeometry(1500, 1);
     var material = new MeshPhongMaterial({
       color: 0xffffff,
@@ -149,10 +173,10 @@ const init = (canvas: HTMLCanvasElement) => {
     orbitControl.update();
 
     scene = new Scene();
-    initBackground();
+    addBackground();
     initLight();
     initAnimatPoints();
-    initParticles();
+    addTorch();
     on();
     requestAnimationFrame(animation);
 };
