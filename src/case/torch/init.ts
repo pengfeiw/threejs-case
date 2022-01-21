@@ -1,16 +1,18 @@
-import {BufferAttribute, CanvasTexture, Color, PerspectiveCamera, Scene, Vector3, WebGLRenderer} from "three";
+import {BackSide, BufferAttribute, CanvasTexture, Color, OctahedronGeometry, DodecahedronBufferGeometry, Mesh, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, PointLight, Scene, Vector3, WebGLRenderer} from "three";
 import Points from "src/engine/object/Points";
 import fs from "./.fs";
 import vs from "./.vs";
 import {resize} from "src/engine/threeUtil";
 import * as MathUtil from "src/util/math";
 import AnimatPoint from "./AnimatPoint";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 
 let renderer: WebGLRenderer;
 let camera: PerspectiveCamera;
 let scene: Scene;
 let points: Points;
-let count = 10000;
+let count = 5000;
+let light: PointLight;
 const animatPoints: AnimatPoint[] = [];
 
 const position = new Float32Array(count * 3);
@@ -47,8 +49,8 @@ const createTexture = () => {
 
 const randomPoint = () => {
     const rad1 = MathUtil.randomInt(0, 360) / 180 * Math.PI;
-    const rad2 = MathUtil.randomInt(-90, 90) / 180 * Math.PI;
-    let radius = MathUtil.randomInt(0, 100);
+    const rad2 = MathUtil.randomInt(-45, 90) / 180 * Math.PI;
+    let radius = MathUtil.randomInt(0, 50);
     const pos = MathUtil.spherical2Cartesian(rad1, rad2, radius);
 
     const point = new AnimatPoint(pos, Math.random(), MathUtil.randomInt(5, 50));
@@ -102,7 +104,7 @@ const updateParticles = (time: number) => {
             const len = MathUtil.randomInt(0, 200);
             const move = MathUtil.spherical2Cartesian(rad1, rad2, len);
 
-            const duration = MathUtil.randomInt(1000, 3000);
+            const duration = MathUtil.randomInt(2000, 5000);
             point.to(new Vector3(point.position.x + move.x, point.position.y + move.y, point.position.z + move.z), duration)
             .sizeTo(point.size.value * 0.5 , duration)
             .opacityTo(0, duration).startAnimation();
@@ -112,6 +114,21 @@ const updateParticles = (time: number) => {
     points.geometry.attributes.position.needsUpdate = true;
     points.geometry.attributes.size.needsUpdate = true;
     points.geometry.attributes.opacity.needsUpdate = true;
+};
+
+const initBackground = () => {
+    var geometry = new OctahedronGeometry(1500, 1);
+    var material = new MeshPhongMaterial({
+      color: 0xffffff,
+      flatShading: true,
+      side: BackSide
+    });
+    scene.add(new Mesh(geometry, material));
+};
+
+const initLight = () => {
+    light = new PointLight(0xff6600, 1, 1800, 1);
+    scene.add(light);
 };
 
 const on = () => {
@@ -125,9 +142,15 @@ const init = (canvas: HTMLCanvasElement) => {
         canvas
     });
 
-    camera = new PerspectiveCamera(45, 1, 0.1, 1000);
+    camera = new PerspectiveCamera(45, 1, 0.1, 5000);
     camera.position.set(0, 0, 600);
+
+    const orbitControl = new OrbitControls(camera, canvas);
+    orbitControl.update();
+
     scene = new Scene();
+    initBackground();
+    initLight();
     initAnimatPoints();
     initParticles();
     on();
