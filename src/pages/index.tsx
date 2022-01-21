@@ -8,12 +8,13 @@ const Home: NextPage = () => {
         <Box
             maxW={1000}
             m="0 auto"
+            padding="10px"
         >
             <H1>Threejs Case</H1>
             <Paragraph>使用 ThreeJs 写的一些小程序。</Paragraph>
             <H2>Source</H2>
             <Paragraph>
-                github： 
+                github：
                 <Link href="https://github.com/pengfeiw/threejs-case">https://github.com/pengfeiw/threejs-case</Link>
             </Paragraph>
             <H2>Case</H2>
@@ -25,6 +26,10 @@ const Home: NextPage = () => {
                 <ListItem>
                     Star：
                     <Link href={getPathWithPrefix("/star")}>https://pengfeiw.github.io/threejs-case/star</Link>
+                </ListItem>
+                <ListItem>
+                    Torch：
+                    <Link href={getPathWithPrefix("/torch")}>https://pengfeiw.github.io/threejs-case/torch</Link>
                 </ListItem>
             </OrderedList>
         </Box>

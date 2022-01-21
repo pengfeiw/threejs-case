@@ -20,12 +20,19 @@ class AnimatState {
     private _duration = 1000;
     private _onUpdateListener?: (object: AnimateObject) => void;
     private _start = false;
+    private _end = false;
     private _startTime = -1;
     private get _endTime() {
         return this._startTime + this._duration;
     }
     public get state() {
         return this._object;
+    }
+    public get isStart() {
+        return this._start;
+    }
+    public get isEnd() {
+        return this._end;
     }
     public constructor(obj: AnimateObject, animatFunc?: AnimatFunc) {
         this._object = obj;
@@ -52,11 +59,13 @@ class AnimatState {
 
     public start() {
         this._start = true;
+        this._end = false;
     }
 
     private stop() {
         this._startTime = -1;
         this._start = false;
+        this._end = true;
     }
 
     public update(time: number = Date.now()) {

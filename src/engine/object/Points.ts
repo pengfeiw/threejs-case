@@ -1,4 +1,4 @@
-import {AdditiveBlending, BufferAttribute, BufferGeometry, Color, IUniform, Points as ThreePoints, ShaderMaterial} from "three";
+import {AdditiveBlending, BufferAttribute, BufferGeometry, IUniform, Points as ThreePoints, ShaderMaterial} from "three";
 
 class Points extends ThreePoints<BufferGeometry, ShaderMaterial> {
     public constructor(vs: string, fs: string, transparent = false, depthWrite = false) {
@@ -14,7 +14,6 @@ class Points extends ThreePoints<BufferGeometry, ShaderMaterial> {
     }
     public setAttributes(name: string, value: BufferAttribute) {
         this.geometry.setAttribute(name, value);
-        // this.geometry.attributes[name].needsUpdate = true;
     }
     public setUniforms(name: string, value: IUniform) {
         this.material.uniforms[name] = value;
