@@ -26,7 +26,10 @@ const on = () => {
     });
 
     window.addEventListener("mousemove", (event) => {
-        mouseposition = {x: event.offsetX, y: event.offsetY};
+        mouseposition = {
+            x: event.offsetX - window.innerWidth * 0.5,
+            y: event.offsetY - window.innerHeight * 0.5
+        };
     });
 };
 
@@ -81,10 +84,11 @@ const createParticles = () => {
     const color = new Color();
     const sizes = [];
     for (let i = 0; i < particles; i++) {
-        const rad1 = MathUtil.degree2Radian(MathUtil.randomInt(0, 360));
-        const rad2 = MathUtil.degree2Radian(MathUtil.randomInt(-90, 90));
-        const radius = MathUtil.randomInt(50, 100);
-        const pos = MathUtil.spherical2Cartesian(rad1, rad2, radius);
+        const pos = {
+            x: MathUtil.randomInt(-1000, 1000),
+            y: MathUtil.randomInt(-1000, 1000),
+            z: MathUtil.randomInt(-1000, 1000),
+        };
 
         positions.push(pos.x);
         positions.push(pos.y);
@@ -94,7 +98,7 @@ const createParticles = () => {
 
         colors.push(color.r, color.g, color.b);
 
-        sizes.push(Math.random() * 5);
+        sizes.push(1);
     }
 
     const particleSystem = new Points(vs, fs);
@@ -116,19 +120,16 @@ const animate = () => {
     const geoSizes = geometry.attributes.size.array as number[];
 
     for (let i = 0; i < particles; i++) {
-        geoSizes[i] = 3 * (1 + Math.sin(0.1 * i + time));
+        geoSizes[i] = 20 * (1 + Math.sin(0.1 * i + time));
     }
 
     geometry.attributes.size.needsUpdate = true;
 
     if (mouseposition) {
-        const h = (mouseposition.x - window.innerWidth * 0.5) / (window.innerWidth * 0.5);
-        const v = (mouseposition.y - window.innerHeight * 0.5) / (window.innerHeight * 0.5);
-        camera.rotation.x -= 0.005 * v;
-        camera.rotation.y -= 0.005 * h;
+        camera.position.x += (mouseposition.x - camera.position.x) * 0.05;
+        camera.position.y += (-mouseposition.y - camera.position.y) * 0.05;
 
-        camera.rotation.x = MathUtil.clamp(camera.rotation.x, -Math.PI * 0.25, Math.PI * 0.25);
-        camera.rotation.y = MathUtil.clamp(camera.rotation.y, -Math.PI * 0.25, Math.PI * 0.25);
+        camera.lookAt(0, 0, 0);
     }
 
     renderer.render(scene, camera);
@@ -141,9 +142,9 @@ const init = (canvas: HTMLCanvasElement) => {
     });
 
     scene = new Scene();
-    camera = new PerspectiveCamera(45, 1, 20, 100);
-    camera.position.set(0, 0, 0);
-    
+    camera = new PerspectiveCamera(55, window.innerWidth / window.innerHeight, 2, 2000);
+    camera.position.set(0, 0, 500);
+
     createParticles();
     resize(camera, renderer);
 
