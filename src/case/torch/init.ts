@@ -170,6 +170,7 @@ const init = (canvas: HTMLCanvasElement) => {
     camera.position.set(0, 0, 600);
 
     const orbitControl = new OrbitControls(camera, canvas);
+    orbitControl.enableZoom = false;
     orbitControl.update();
 
     scene = new Scene();
