@@ -9,12 +9,14 @@ import {
     InstancedBufferAttribute,
     Vector2,
     RawShaderMaterial,
-    Mesh
+    Mesh,
+    DoubleSide
 } from "three";
 import {resize} from "src/engine/threeUtil";
 import {getPathWithPrefix} from "src/util";
 import fs from "./pixelImage.fs";
 import vs from "./pixelImage.vs";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 
 let renderer: WebGLRenderer;
 let scene: Scene;
@@ -88,6 +90,7 @@ const initParticles = () => {
         fragmentShader: fs,
         depthTest: false,
         transparent: true,
+        side: DoubleSide
     });
     scene.add(new Mesh(geometryParticles, materialParticles));
 };
@@ -106,6 +109,10 @@ const setup = (canvas: HTMLCanvasElement) => {
     });
     camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 0, 300);
+
+    const orbitControl = new OrbitControls(camera, canvas);
+    orbitControl.update();
+
     scene = new Scene();
     loader = new TextureLoader();
     resize(camera, renderer);

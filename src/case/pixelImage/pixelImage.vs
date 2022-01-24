@@ -15,6 +15,7 @@ void main() {
 
     vuv = (uv.xy + vec2(offset.x, height - offset.y)) * cellSize;
 
-    gl_Position = vec4(offset.x - width * 0.5 + position.x, height * 0.5 - offset.y + position.y, position.z, 1.);
+    gl_Position = vec4(offset.x - width * 0.5, height * 0.5 - offset.y, position.z, 1.);
+    gl_Position = vec4(gl_Position.xy + position.xy * 0.5, 0.0, 1.0);
     gl_Position = projectionMatrix * modelViewMatrix * gl_Position;
 }
