@@ -130,7 +130,7 @@ const on = () => {
 const init = (canvas: HTMLCanvasElement) => {
     setup(canvas);
     on();
-    loader.load(getPathWithPrefix("/images/pixelImage/1.jpg"), start);
+    loader.load(getPathWithPrefix("/images/pixelImage/2.jpg"), start);
 };
 
 export default init;
