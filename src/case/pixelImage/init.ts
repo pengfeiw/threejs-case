@@ -26,10 +26,11 @@ let texture: Texture;
 let colors: Float32Array;
 let totalPoints = 0;
 let width = 0, height = 0;
+let particles: Mesh; 
 
-const loop = () => {
+const loop = (time: number) => {
     requestAnimationFrame(loop);
-
+    (particles.material as RawShaderMaterial).uniforms.uTime.value = time;
     renderer.render(scene, camera);
 };
 
@@ -82,6 +83,7 @@ const initParticles = () => {
     const uniforms = {
         uTextureSize: {value: new Vector2(width, height)},
         uTexture: {value: texture},
+        uTime: {value: 1}
     };
 
     const materialParticles = new RawShaderMaterial({
@@ -90,16 +92,19 @@ const initParticles = () => {
         fragmentShader: fs,
         depthTest: false,
         transparent: true,
-        side: DoubleSide
+        side: DoubleSide,
     });
-    scene.add(new Mesh(geometryParticles, materialParticles));
+
+    particles = new Mesh(geometryParticles, materialParticles);
+
+    scene.add(particles);
 };
 
 const start = (tex: Texture) => {
     texture = tex;
     pixelExtraction();
     initParticles();
-    loop();
+    requestAnimationFrame(loop);
 };
 
 const setup = (canvas: HTMLCanvasElement) => {
