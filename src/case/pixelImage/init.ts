@@ -16,7 +16,6 @@ import {resize} from "src/engine/threeUtil";
 import {getPathWithPrefix} from "src/util";
 import fs from "./pixelImage.fs";
 import vs from "./pixelImage.vs";
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import AnimatState from "src/engine/animatState/AnimatState";
 
 let renderer: WebGLRenderer;
@@ -38,9 +37,6 @@ const loop = (time: number) => {
     (particles.material as RawShaderMaterial).uniforms.uThick.value = imgThick;
     (particles.material as RawShaderMaterial).uniforms.uTime.value = time;
 
-    if (inStartAnimation && thickAnimat.isEnd) {
-        thickAnimat.to({value: 50}, 2000).start();
-    }
     renderer.render(scene, camera);
 };
 
@@ -115,7 +111,10 @@ const start = (tex: Texture) => {
     texture = tex;
     pixelExtraction();
     initParticles();
-    thickAnimat.to({value: 1}, 1000).onUpdate((thickObj) => imgThick = thickObj.value).start();
+    thickAnimat.to({value: 1}, 1000).onUpdate((thickObj) => imgThick = thickObj.value).onEnd(() => {
+        inStartAnimation = false;
+        thickAnimat.to({value: 50}, 2000).start();
+    }).start();
     requestAnimationFrame(loop);
 };
 
@@ -127,9 +126,6 @@ const setup = (canvas: HTMLCanvasElement) => {
     camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 0, 300);
 
-    const orbitControl = new OrbitControls(camera, canvas);
-    orbitControl.update();
-
     scene = new Scene();
     loader = new TextureLoader();
     resize(camera, renderer);
@@ -137,12 +133,37 @@ const setup = (canvas: HTMLCanvasElement) => {
 
 const on = () => {
     window.addEventListener("resize", () => resize(camera, renderer));
+    window.addEventListener("mousemove", (event) => {
+        const mouseposition = {
+            x: (event.offsetX - window.innerWidth * 0.5) * 0.1,
+            y: (event.offsetY - window.innerHeight * 0.5) * 0.1
+        };
+
+        camera.position.x += (mouseposition.x - camera.position.x) * 0.1;
+        camera.position.y += (-mouseposition.y - camera.position.y) * 0.1;
+
+        camera.lookAt(0, 0, 0);
+    });
+
+    window.addEventListener("mousedown", () => {
+        if (!inStartAnimation) {
+            thickAnimat.to({value: 1}, 1000).start();
+        }
+    });
+
+    window.addEventListener("mouseup", () => {
+        if (!inStartAnimation) {
+            thickAnimat.to({value: 50}, 1000).start();
+        }
+    });
 }
 
 const init = (canvas: HTMLCanvasElement) => {
+    canvas.style.cursor = "pointer";
+
     setup(canvas);
     on();
-    loader.load(getPathWithPrefix("/images/pixelImage/1.jpg"), start);
+    loader.load(getPathWithPrefix("/images/pixelImage/3.jpg"), start);
 };
 
 export default init;
