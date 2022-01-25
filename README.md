@@ -1,6 +1,6 @@
 ## threejs-case
 
-使用 threejs 写的小玩意。
+使用 threejs 写的小玩意，所有的 case 都会在 [minicode](https://pengfeiw.github.io/minicode) 上展示。
 
 ## case
 
