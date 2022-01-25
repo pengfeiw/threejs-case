@@ -132,6 +132,21 @@ const setup = (canvas: HTMLCanvasElement) => {
 };
 
 const on = () => {
+    const mousemove = (x: number, y: number) => {
+        camera.position.x += (x - camera.position.x) * 0.1;
+        camera.position.y += (-y - camera.position.y) * 0.1;
+        camera.lookAt(0, 0, 0);
+    };
+    const mousedown = () => {
+        if (!inStartAnimation) {
+            thickAnimat.to({value: 1}, 1000).start();
+        }
+    };
+    const mouseup = () => {
+        if (!inStartAnimation) {
+            thickAnimat.to({value: 50}, 1000).start();
+        }
+    };
     window.addEventListener("resize", () => resize(camera, renderer));
     window.addEventListener("mousemove", (event) => {
         const mouseposition = {
@@ -139,23 +154,25 @@ const on = () => {
             y: (event.offsetY - window.innerHeight * 0.5) * 0.1
         };
 
-        camera.position.x += (mouseposition.x - camera.position.x) * 0.1;
-        camera.position.y += (-mouseposition.y - camera.position.y) * 0.1;
-
-        camera.lookAt(0, 0, 0);
+        mousemove(mouseposition.x, mouseposition.y);
     });
 
-    window.addEventListener("mousedown", () => {
-        if (!inStartAnimation) {
-            thickAnimat.to({value: 1}, 1000).start();
-        }
+    window.addEventListener("mousedown", mousedown);
+
+    window.addEventListener("mouseup", mouseup);
+
+    window.addEventListener("touchmove", (event) => {
+        const touchpos = {
+            x: event.touches[0].pageX,
+            y: event.touches[0].pageY
+        };
+
+        mousemove(touchpos.x, touchpos.y);
     });
 
-    window.addEventListener("mouseup", () => {
-        if (!inStartAnimation) {
-            thickAnimat.to({value: 50}, 1000).start();
-        }
-    });
+    window.addEventListener("touchstart", mousedown);
+
+    window.addEventListener("touchend", mouseup);
 }
 
 const init = (canvas: HTMLCanvasElement) => {
