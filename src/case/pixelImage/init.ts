@@ -28,7 +28,7 @@ let totalPoints = 0;
 let width = 0, height = 0;
 let particles: Mesh;
 let imgThick = 1000;
-let thickAnimat = new AnimatState({value: imgThick}, "LINEAR"); 
+let thickAnimat = new AnimatState({value: imgThick}, "LINEAR");
 let inStartAnimation = true;
 
 const loop = (time: number) => {
@@ -160,15 +160,6 @@ const on = () => {
     window.addEventListener("mousedown", mousedown);
 
     window.addEventListener("mouseup", mouseup);
-
-    window.addEventListener("touchmove", (event) => {
-        const touchpos = {
-            x: event.touches[0].pageX,
-            y: event.touches[0].pageY
-        };
-
-        mousemove(touchpos.x, touchpos.y);
-    });
 
     window.addEventListener("touchstart", mousedown);
 
