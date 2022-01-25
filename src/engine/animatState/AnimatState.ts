@@ -19,6 +19,7 @@ class AnimatState {
     private _startState: AnimateObject = {};
     private _duration = 1000;
     private _onUpdateListener?: (object: AnimateObject) => void;
+    private _onEndListener?: (object: AnimateObject) => void;
     private _start = false;
     private _end = false;
     private _startTime = -1;
@@ -43,6 +44,17 @@ class AnimatState {
 
     public onUpdate(listener?: (object: AnimateObject) => void): this {
         this._onUpdateListener = listener;
+        return this;
+    }
+
+    public onEnd(listener: (object: AnimateObject) => void, clearOnFinish = true): this {
+        this._onEndListener = (obj: AnimateObject) => {
+            if (clearOnFinish) {
+                this._onEndListener = undefined;
+            }
+
+            listener(obj);
+        };
         return this;
     }
 
@@ -89,6 +101,10 @@ class AnimatState {
             }
 
             this.stop();
+
+            if (this._onEndListener) {
+                this._onEndListener(this._object);
+            }
 
             return false;
         }

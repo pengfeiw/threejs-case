@@ -31,6 +31,10 @@ const Home: NextPage = () => {
                     Torch：
                     <Link href={getPathWithPrefix("/torch")}>https://pengfeiw.github.io/threejs-case/torch</Link>
                 </ListItem>
+                <ListItem>
+                    Torch：
+                    <Link href={getPathWithPrefix("/pixel-image")}>https://pengfeiw.github.io/threejs-case/pixelImage</Link>
+                </ListItem>
             </OrderedList>
         </Box>
     );
