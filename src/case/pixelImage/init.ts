@@ -124,7 +124,7 @@ const setup = (canvas: HTMLCanvasElement) => {
         canvas
     });
     camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 0, 300);
+    camera.position.set(0, 0, 200);
 
     scene = new Scene();
     loader = new TextureLoader();
@@ -171,7 +171,7 @@ const init = (canvas: HTMLCanvasElement) => {
 
     setup(canvas);
     on();
-    loader.load(getPathWithPrefix("/images/pixelImage/3.jpg"), start);
+    loader.load(getPathWithPrefix("/images/pixelImage/4.jpg"), start);
 };
 
 export default init;
