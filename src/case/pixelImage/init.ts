@@ -17,6 +17,7 @@ import {getPathWithPrefix} from "src/util";
 import fs from "./pixelImage.fs";
 import vs from "./pixelImage.vs";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import AnimatState from "src/engine/animatState/AnimatState";
 
 let renderer: WebGLRenderer;
 let scene: Scene;
@@ -26,11 +27,20 @@ let texture: Texture;
 let colors: Float32Array;
 let totalPoints = 0;
 let width = 0, height = 0;
-let particles: Mesh; 
+let particles: Mesh;
+let imgThick = 1000;
+let thickAnimat = new AnimatState({value: imgThick}, "LINEAR"); 
+let inStartAnimation = true;
 
 const loop = (time: number) => {
     requestAnimationFrame(loop);
+    thickAnimat.update(time);
+    (particles.material as RawShaderMaterial).uniforms.uThick.value = imgThick;
     (particles.material as RawShaderMaterial).uniforms.uTime.value = time;
+
+    if (inStartAnimation && thickAnimat.isEnd) {
+        thickAnimat.to({value: 50}, 2000).start();
+    }
     renderer.render(scene, camera);
 };
 
@@ -83,7 +93,8 @@ const initParticles = () => {
     const uniforms = {
         uTextureSize: {value: new Vector2(width, height)},
         uTexture: {value: texture},
-        uTime: {value: 1}
+        uTime: {value: 1},
+        uThick: {value: imgThick}
     };
 
     const materialParticles = new RawShaderMaterial({
@@ -104,6 +115,7 @@ const start = (tex: Texture) => {
     texture = tex;
     pixelExtraction();
     initParticles();
+    thickAnimat.to({value: 1}, 1000).onUpdate((thickObj) => imgThick = thickObj.value).start();
     requestAnimationFrame(loop);
 };
 
@@ -130,7 +142,7 @@ const on = () => {
 const init = (canvas: HTMLCanvasElement) => {
     setup(canvas);
     on();
-    loader.load(getPathWithPrefix("/images/pixelImage/2.jpg"), start);
+    loader.load(getPathWithPrefix("/images/pixelImage/1.jpg"), start);
 };
 
 export default init;
