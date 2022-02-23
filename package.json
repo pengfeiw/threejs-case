@@ -1,6 +1,11 @@
 {
     "name": "threejs-case",
     "private": true,
+    "author": "Wang Pengfei <pengfeixc@sina.com> (http://pengfeixc.com/)",
+    "homepage": "https://pengfeiw.github.io/minicode",
+    "bugs": "https://github.com/pengfeiw/threejs-case/issues",
+    "description": "Some threejs examples.",
+    "keywords": ["threejs", "webgl", "3d", "web", "minicode", "grahpics"],
     "scripts": {
         "dev": "next dev",
         "build": "next build",
